@@ -2,7 +2,9 @@
 FROM gradle:8.3-jdk17 AS build
 WORKDIR /home/ktor
 COPY . .
-RUN gradle installDist
+# RUN gradle installDist
+RUN chmod +x ./gradlew
+RUN ./gradlew installDist --no-daemon
 
 # Étape 2 : image finale pour exécution
 FROM eclipse-temurin:17-jre
