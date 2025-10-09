@@ -7,11 +7,15 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 object DatabaseFactory {
     fun init() {
+        val dbUrl = System.getenv("DB_URL")
+        val dbUser = System.getenv("DB_USER")
+        val dbPassword = System.getenv("DB_PASSWORD")
+
         Database.connect(
-            url = "jdbc:mysql://localhost:3306/pokemontcg",
+            url = dbUrl,
             driver = "com.mysql.cj.jdbc.Driver",
-            user = "root", // à adapter
-            password = "SQLmdp610?happy" // à adapter
+            user = dbUser,
+            password = dbPassword
         )
 
         transaction {
