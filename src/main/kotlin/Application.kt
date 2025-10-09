@@ -1,6 +1,7 @@
 package com.example
 
 import com.example.plugins.DatabaseFactory
+import com.example.plugins.configureApiKeyAuth
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -9,6 +10,7 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     configureSerialization()
+    configureApiKeyAuth()
     DatabaseFactory.init()
     configureRouting()
 }
