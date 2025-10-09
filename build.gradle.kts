@@ -27,6 +27,5 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:0.51.1")
     implementation("org.jetbrains.exposed:exposed-java-time:0.51.1")
 
-    // MySQL driver
-    implementation("mysql:mysql-connector-java:8.0.33")
+    implementation("org.postgresql:postgresql:42.7.2")
 }

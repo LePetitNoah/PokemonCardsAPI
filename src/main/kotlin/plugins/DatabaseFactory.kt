@@ -13,7 +13,7 @@ object DatabaseFactory {
 
         Database.connect(
             url = dbUrl,
-            driver = "com.mysql.cj.jdbc.Driver",
+            driver = "org.postgresql.Driver",
             user = dbUser,
             password = dbPassword
         )
