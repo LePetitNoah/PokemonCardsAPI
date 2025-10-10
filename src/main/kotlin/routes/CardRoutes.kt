@@ -48,14 +48,14 @@ fun Route.cardRoutes() {
                                 )
                             }
                         }
-
+                        val list : List<Int>? = listOf(cardRow[Cards.nationalPokedexNumbers]!!)
                         Card(
                             id = cardRow[Cards.id],
                             name = cardRow[Cards.name],
                             set = set,
                             number = cardRow[Cards.number],
                             rarity = cardRow[Cards.rarity],
-                            nationalPokedexNumbers = cardRow[Cards.nationalPokedexNumbers],
+                            nationalPokedexNumbers = list,
                             images = image
                         )
                     }
@@ -93,8 +93,8 @@ fun Route.cardRoutes() {
                     stmt[Cards.number] = card.number
                     stmt[Cards.rarity] = card.rarity
                     stmt[Cards.setId] = card.set?.id
-                    stmt[Cards.imageId] = imageId
-                    stmt[Cards.nationalPokedexNumbers] = card.nationalPokedexNumbers
+                    stmt[Cards.imageId] = id
+                    stmt[Cards.nationalPokedexNumbers] = card.nationalPokedexNumbers?.firstOrNull()
                 }
             }
 
@@ -135,8 +135,8 @@ fun Route.cardRoutes() {
                             it[number] = card.number
                             it[rarity] = card.rarity
                             it[setId] = card.set?.id
-                            it[imageId] = imageId
-                            it[nationalPokedexNumbers] = card.nationalPokedexNumbers
+                            it[imageId] = id
+                            it[nationalPokedexNumbers] = card.nationalPokedexNumbers?.firstOrNull()
                         }
                     }
                 }

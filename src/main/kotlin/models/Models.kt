@@ -9,7 +9,7 @@ data class Card(
     var set: Set? = Set(),
     var number: String? = null,
     var rarity: String? = null,
-    var nationalPokedexNumbers: Int? = null,
+    var nationalPokedexNumbers: List<Int>? = null,
     var images: Image? = Image(),
 )
 
