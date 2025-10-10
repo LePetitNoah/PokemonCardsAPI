@@ -11,15 +11,6 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    install(ContentNegotiation) {
-        json(
-            kotlinx.serialization.json.Json {
-                prettyPrint = true
-                isLenient = true
-                ignoreUnknownKeys = true
-            }
-        )
-    }
     configureSerialization()
     configureApiKeyAuth()
     DatabaseFactory.init()
