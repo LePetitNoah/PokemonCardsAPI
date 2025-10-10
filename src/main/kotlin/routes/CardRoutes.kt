@@ -3,6 +3,7 @@ package com.example.routes
 import com.example.models.Card
 
 import com.example.models.Cards
+import com.example.models.CardsWrapper
 import com.example.models.Image
 import com.example.models.Images
 import com.example.models.Set
@@ -80,13 +81,10 @@ fun Route.cardRoutes() {
                 }
 
                 // Insert image
-                val imageId = transaction {
-                    val id = Images.insert { stmt ->
-                        stmt[Images.small] = card.images?.small
-                        stmt[Images.large] = card.images?.large
-                    } get Images.id
-                    id
-                }
+                val id = Images.insert { stmt ->
+                    stmt[Images.small] = card.images?.small
+                    stmt[Images.large] = card.images?.large
+                } get Images.id
 
                 // Insert card
                 Cards.insert { stmt ->
@@ -101,6 +99,50 @@ fun Route.cardRoutes() {
             }
 
             call.respondText("Card added successfully!")
+        }
+    }
+
+    route("/cards/bulk") {
+        post {
+            val wrapper = call.receive<CardsWrapper>()
+            val cards = wrapper.data
+
+            transaction {
+                cards.forEach { card ->
+                    // Insert Set if not exists
+                    card.set?.let { s ->
+                        if (!Sets.selectAll().where { Sets.id eq (s.id ?: "") }.any()) {
+                            Sets.insert {
+                                it[id] = s.id ?: ""
+                                it[name] = s.name ?: ""
+                                it[series] = s.series
+                                it[total] = s.total
+                            }
+                        }
+                    }
+
+                    // Insert Image
+                    val id = Images.insert { stmt ->
+                        stmt[Images.small] = card.images?.small
+                        stmt[Images.large] = card.images?.large
+                    } get Images.id
+
+                    // Insert Card
+                    if (!Cards.selectAll().where { Cards.id eq (card.id ?: "") }.any()) {
+                        Cards.insert {
+                            it[Cards.id] = card.id ?: ""
+                            it[name] = card.name
+                            it[number] = card.number
+                            it[rarity] = card.rarity
+                            it[setId] = card.set?.id
+                            it[imageId] = imageId
+                            it[nationalPokedexNumbers] = card.nationalPokedexNumbers
+                        }
+                    }
+                }
+            }
+
+            call.respondText("${cards.size} cards added successfully!")
         }
     }
 }

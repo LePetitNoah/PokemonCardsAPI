@@ -26,3 +26,8 @@ data class Image(
     var small: String? = null,
     var large: String? = null
 )
+
+@Serializable
+data class CardsWrapper(
+    val data: List<Card>
+)
