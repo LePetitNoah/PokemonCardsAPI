@@ -28,6 +28,6 @@ data class Image(
 )
 
 @Serializable
-data class CardsWrapper(
+data class CardsResponse(
     val data: List<Card>
 )
