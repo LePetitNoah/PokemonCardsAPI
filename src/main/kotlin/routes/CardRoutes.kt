@@ -103,7 +103,7 @@ fun Route.cardRoutes() {
                 if (cards.isEmpty()) {
                     call.respond(HttpStatusCode.NotFound, mapOf("message" to "Aucune carte trouvée pour le set $setId"))
                 } else {
-                    call.respond(HttpStatusCode.OK, cards)
+                    call.respond(HttpStatusCode.OK, CardsResponse(cards))
                 }
 
             } catch (e: Exception) {
