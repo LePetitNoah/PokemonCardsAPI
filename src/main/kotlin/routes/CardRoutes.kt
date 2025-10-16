@@ -16,6 +16,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -67,7 +68,7 @@ fun Route.cardRoutes() {
         }
 
         // POST new card
-        post("") {
+        post {
             val card = call.receive<CardReceive>()
             print(card)
             transaction {
@@ -103,10 +104,27 @@ fun Route.cardRoutes() {
 
             call.respondText("Card added successfully!")
         }
+
+        delete {
+            try {
+                val deletedCount = transaction {
+                    Cards.deleteAll() // Supprime toutes les cartes de la table Cards
+                }
+                call.respond(HttpStatusCode.OK, mapOf(
+                    "message" to "Toutes les cartes ont été supprimées.",
+                    "deletedCount" to deletedCount.toString()
+                ))
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, mapOf(
+                    "error" to "Impossible de supprimer les cartes.",
+                    "details" to e.localizedMessage
+                ))
+            }
+        }
     }
 
     route("/cards/bulk") {
-        post("") {
+        post {
 
                 // On récupère le corps JSON envoyé
                 val request = call.receive<CardsReceived>()
