@@ -46,8 +46,3 @@ data class CardsResponse(
 data class CardsReceived(
     val data: List<CardReceive>
 )
-
-@Serializable
-data class Test(
-    val content: String
-)
