@@ -3,7 +3,18 @@ package com.example.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Card(
+data class CardSend(
+    var id: String? = null,
+    var name: String? = null,
+    var set: Set? = Set(),
+    var number: String? = null,
+    var rarity: String? = null,
+    var nationalPokedexNumbers: Int? = null,
+    var images: Image? = Image(),
+)
+
+@Serializable
+data class CardReceive(
     var id: String? = null,
     var name: String? = null,
     var set: Set? = Set(),
@@ -12,7 +23,6 @@ data class Card(
     var nationalPokedexNumbers: List<Int>? = null,
     var images: Image? = Image(),
 )
-
 @Serializable
 data class Set(
     var id: String? = null,
@@ -29,5 +39,15 @@ data class Image(
 
 @Serializable
 data class CardsResponse(
-    val data: List<Card>
+    val data: List<CardSend>
+)
+
+@Serializable
+data class CardsReceived(
+    val data: List<CardReceive>
+)
+
+@Serializable
+data class Test(
+    val content: String
 )

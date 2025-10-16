@@ -1,13 +1,16 @@
 package com.example.routes
 
-import com.example.models.Card
+import com.example.models.CardReceive
+import com.example.models.CardSend
 
 import com.example.models.Cards
+import com.example.models.CardsReceived
 import com.example.models.CardsResponse
 import com.example.models.Image
 import com.example.models.Images
 import com.example.models.Set
 import com.example.models.Sets
+import com.example.models.Test
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -49,13 +52,13 @@ fun Route.cardRoutes() {
                                 )
                             }
                         }
-                        Card(
+                        CardSend(
                             id = cardRow[Cards.id],
                             name = cardRow[Cards.name],
                             set = set,
                             number = cardRow[Cards.number],
                             rarity = cardRow[Cards.rarity],
-                            //nationalPokedexNumbers = cardRow[Cards.nationalPokedexNumbers],
+                            nationalPokedexNumbers = cardRow[Cards.nationalPokedexNumbers],
                             images = image
                         )
                     }
@@ -64,9 +67,9 @@ fun Route.cardRoutes() {
         }
 
         // POST new card
-        post {
-            val card = call.receive<Card>()
-
+        post("") {
+            val card = call.receive<CardReceive>()
+            print(card)
             transaction {
                 // Insert Set if not exists
                 card.set?.let { s ->
@@ -103,69 +106,63 @@ fun Route.cardRoutes() {
     }
 
     route("/cards/bulk") {
-        post {
-            try {
+        post("") {
+
                 // On récupère le corps JSON envoyé
-                val request = call.receive<BulkCardsRequest>()
-
+                val request = call.receive<CardsReceived>()
                 // On insère en base dans une transaction Exposed
-//                transaction {
-//                    request.data.forEach { rawCard ->
-//                        // Extraction et transformation pour coller à ton modèle
-//                        val cardId = rawCard.id ?: return@forEach
-//                        val set = rawCard.set
-//                        val image = rawCard.images
-//
-//                        // --- SET ---
-//                        var setId: String? = null
-//                        if (set != null && set.id != null) {
-//                            // On vérifie si le set existe déjà
-//                            val existingSet = Sets.select { Sets.id eq set.id!! }.singleOrNull()
-//                            if (existingSet == null) {
-//                                Sets.insert {
-//                                    it[id] = set.id!!
-//                                    it[name] = set.name ?: ""
-//                                    it[series] = set.series
-//                                    it[total] = set.total
-//                                }
-//                            }
-//                            setId = set.id
-//                        }
-//
-//                        // --- IMAGE ---
-//                        var imageId: Int? = null
-//                        if (image != null && (image.small != null || image.large != null)) {
-//                            imageId = Images.insert { stmt ->
-//                                stmt[Images.small] = image.small
-//                                stmt[Images.large] = image.large
-//                            } get Images.id
-//                        }
-//
-//                        // --- NATIONAL POKEDEX ---
-//                        val pokedexNumber = rawCard.nationalPokedexNumbers?.firstOrNull()
-//
-//                        // --- CARD ---
-//                        // On évite les doublons (si déjà existante)
-//                        val existingCard = Cards.select { Cards.id eq cardId }.singleOrNull()
-//                        if (existingCard == null) {
-//                            Cards.insert {
-//                                it[Cards.id] = cardId
-//                                it[Cards.name] = rawCard.name
-//                                it[Cards.setId] = setId
-//                                it[Cards.number] = rawCard.number
-//                                it[Cards.rarity] = rawCard.rarity
-//                                it[Cards.nationalPokedexNumbers] = pokedexNumber
-//                                it[Cards.imageId] = imageId
-//                            }
-//                        }
-//                    }
-//                }
+                transaction {
+                    request.data.forEach { rawCard ->
+                        // Extraction et transformation pour coller à ton modèle
+                        val cardId = rawCard.id ?: return@forEach
+                        val set = rawCard.set
+                        val image = rawCard.images
 
-                call.respond(HttpStatusCode.Created, mapOf("status" to "success", "count" to request.data.size))
+                        // --- SET ---
+                        var setId: String? = null
+                        if (set != null && set.id != null) {
+                            // On vérifie si le set existe déjà
+                            val existingSet = Sets.select { Sets.id eq set.id!! }.singleOrNull()
+                            if (existingSet == null) {
+                                Sets.insert {
+                                    it[id] = set.id!!
+                                    it[name] = set.name ?: ""
+                                    it[series] = set.series
+                                    it[total] = set.total
+                                }
+                            }
+                            setId = set.id
+                        }
 
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadRequest, mapOf("error" to e.message))
-            }
+                        // --- IMAGE ---
+                        var imageId: Int? = null
+                        if (image != null && (image.small != null || image.large != null)) {
+                            imageId = Images.insert { stmt ->
+                                stmt[Images.small] = image.small
+                                stmt[Images.large] = image.large
+                            } get Images.id
+                        }
+
+                        // --- NATIONAL POKEDEX ---
+                        val pokedexNumber = rawCard.nationalPokedexNumbers?.firstOrNull()
+
+                        // --- CARD ---
+                        // On évite les doublons (si déjà existante)
+                        val existingCard = Cards.select { Cards.id eq cardId }.singleOrNull()
+                        if (existingCard == null) {
+                            Cards.insert {
+                                it[Cards.id] = cardId
+                                it[Cards.name] = rawCard.name
+                                it[Cards.setId] = setId
+                                it[Cards.number] = rawCard.number
+                                it[Cards.rarity] = rawCard.rarity
+                                it[Cards.nationalPokedexNumbers] = pokedexNumber
+                                it[Cards.imageId] = imageId
+                            }
+                        }
+                    }
+                }
+                call.respond(HttpStatusCode.Created, mapOf("status" to "success", "count" to request.data.size.toString()))
         }
     }
 }
